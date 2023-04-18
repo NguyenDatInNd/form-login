@@ -4,6 +4,7 @@ import { TextField, Button, Typography, MenuItem } from "@material-ui/core";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 type UserSignUpForm = {
   email: string;
@@ -17,7 +18,7 @@ type UserSignUpForm = {
 
 const FormSignUp: React.FC = () => {
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -103,7 +104,7 @@ const FormSignUp: React.FC = () => {
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
         {errorNoti && (
-          <Typography color="error">Email này đã được đăng ký!</Typography>
+          <Typography color="error">{t('emailError')}</Typography>
         )}
         <section>
           <Controller
@@ -114,17 +115,17 @@ const FormSignUp: React.FC = () => {
               <TextField
                 error={!!errors?.email || !!errorNoti}
                 style={{ height: "55px", width: "300px" }}
-                label="Địa chỉ email"
+                label={t('email')}
                 {...field}
                 {...register("email")}
               />
             )}
           />
           {errors?.email?.type === "required" && (
-            <Typography color="error">Nhập email của bạn</Typography>
+            <Typography color="error">{t('emailRequire')}</Typography>
           )}
           {errors?.email?.type === "pattern" && (
-            <Typography color="error">Email chưa đúng định dạng</Typography>
+            <Typography color="error">{t('emailInvalid')}</Typography>
           )}
         </section>
 
@@ -137,7 +138,7 @@ const FormSignUp: React.FC = () => {
               <TextField
                 error={!!errors?.password}
                 style={{ height: "55px", width: "300px" }}
-                label="Mật khẩu"
+                label={t('password')}
                 type="password"
                 {...field}
                 {...register("password")}
@@ -145,13 +146,13 @@ const FormSignUp: React.FC = () => {
             )}
           />
           {errors?.password?.type === "required" && (
-            <Typography color="error">Nhập mật khẩu của bạn</Typography>
+            <Typography color="error">{t('passwordRequire')}</Typography>
           )}
           {errors?.password?.type === "maxLength" && (
-            <Typography color="error">Mật khẩu quá dài!</Typography>
+            <Typography color="error">{t('maxPasswordInvalid')}</Typography>
           )}
           {errors?.password?.type === "minLength" && (
-            <Typography color="error">Mật khẩu quá ngắn!</Typography>
+            <Typography color="error">{t('minPasswordInvalid')}</Typography>
           )}
         </section>
 
@@ -164,7 +165,7 @@ const FormSignUp: React.FC = () => {
               <TextField
                 error={!!errors?.repeatPassword}
                 style={{ height: "55px", width: "300px" }}
-                label="Xác nhận lại mật khẩu"
+                label={t('repeatPassword')}
                 type="password"
                 {...field}
                 {...register("repeatPassword")}
@@ -172,10 +173,10 @@ const FormSignUp: React.FC = () => {
             )}
           />
           {errors?.repeatPassword?.type === "validate" && (
-            <Typography color="error">Mật khẩu không trùng nhau</Typography>
+            <Typography color="error">{t('matchPasswordInvalid')}</Typography>
           )}
           {errors?.repeatPassword?.type === "required" && (
-            <Typography color="error">Nhập lại mật khẩu</Typography>
+            <Typography color="error">{t('passwordRequire')}</Typography>
           )}
         </section>
 
@@ -188,14 +189,14 @@ const FormSignUp: React.FC = () => {
               <TextField
                 error={!!errors?.name}
                 style={{ height: "55px", width: "300px" }}
-                label="Họ và tên"
+                label={t('name')}
                 {...field}
                 {...register("name")}
               />
             )}
           />
           {errors?.name?.type === "required" && (
-            <Typography color="error">Nhập tên của bạn</Typography>
+            <Typography color="error">{t('nameRequire')}</Typography>
           )}
         </section>
 
@@ -209,9 +210,9 @@ const FormSignUp: React.FC = () => {
                 select
                 error={!!errors?.gender}
                 style={{ height: "55px", width: "300px" }}
-                label="Giới tính"
-                {...field}
+                label={t('gender')}
                 {...register("gender")}
+                {...field}
               >
                 {SelectGender.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
@@ -222,7 +223,7 @@ const FormSignUp: React.FC = () => {
             )}
           />
           {errors?.gender?.type === "required" && (
-            <Typography color="error">Chọn giới tính của bạn</Typography>
+            <Typography color="error">{t('genderRequire')}</Typography>
           )}
         </section>
 
@@ -237,7 +238,7 @@ const FormSignUp: React.FC = () => {
                 error={!!errors?.region}
                 style={{ height: "55px", width: "300px" }}
                 {...field}
-                label="Quốc gia"
+                label={t('region')}
                 {...register("region")}
                 value={cityId}
                 onChange={(e) => {
@@ -253,7 +254,7 @@ const FormSignUp: React.FC = () => {
             )}
           />
           {errors?.region?.type === "required" && (
-            <Typography color="error">Chọn quốc gia của bạn</Typography>)}
+            <Typography color="error">{t('regionRequire')}</Typography>)}
         </section>
 
         <section>
@@ -266,9 +267,9 @@ const FormSignUp: React.FC = () => {
                 select
                 error={!!errors?.state}
                 style={{ height: "55px", width: "300px" }}
-                {...field}
-                label="Thành Phố"
                 {...register("state")}
+                {...field}
+                label={t('state')}
               >
                 {cityData?.map((option, id) => (
                   <MenuItem key={id} value={option.id}>
@@ -279,7 +280,7 @@ const FormSignUp: React.FC = () => {
             )}
           />
           {errors?.state?.type === "required" && (
-            <Typography color="error">Chọn thành phố của bạn</Typography>)}
+            <Typography color="error">{t('stateRequire')}</Typography>)}
         </section>
 
         <section>
@@ -289,7 +290,7 @@ const FormSignUp: React.FC = () => {
             variant="contained"
             color="primary"
           >
-            Đăng ký
+           {t('register')}
           </Button>
         </section>
       </form>

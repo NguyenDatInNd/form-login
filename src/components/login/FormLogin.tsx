@@ -4,6 +4,8 @@ import { TextField, Checkbox, Button, Typography } from "@material-ui/core";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 
 type UserSubmitForm = {
   username: string;
@@ -12,6 +14,7 @@ type UserSubmitForm = {
 };
 
 const LoginForm: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [rememberMe, setRememberMe] = React.useState(false);
 
@@ -56,7 +59,7 @@ const LoginForm: React.FC = () => {
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
         {errorNoti && (
-          <Typography color="error">Invalid username / password</Typography>
+          <Typography color="error">{t('valueInvalid')}</Typography>
         )}
         <section>
           <Controller
@@ -67,7 +70,7 @@ const LoginForm: React.FC = () => {
               <TextField
                 error={!!errors?.username}
                 style={{ height: "55px", width: "300px" }}
-                label="Địa chỉ email"
+                label={t('email')}
                 size="medium"
                 {...field}
                 {...register("username")}
@@ -75,10 +78,10 @@ const LoginForm: React.FC = () => {
             )}
           />
           {errors?.username?.type === "required" && (
-            <Typography color="error">Nhập email của bạn</Typography>
+            <Typography color="error">{t('emailRequire')}</Typography>
           )}
           {errors?.username?.type === "pattern" && (
-            <Typography color="error">Email chưa đúng định dạng</Typography>
+            <Typography color="error">{t('emailInvalid')}</Typography>
           )}
         </section>
         <section>
@@ -91,7 +94,7 @@ const LoginForm: React.FC = () => {
                 error={!!errors?.password}
                 style={{ height: "55px", width: "300px" }}
                 size="medium"
-                label="Mật khẩu"
+                label={t('password')}
                 type="password"
                 {...field}
                 {...register("password")}
@@ -99,18 +102,18 @@ const LoginForm: React.FC = () => {
             )}
           />
           {errors?.password?.type === "required" && (
-            <Typography color="error">Nhập mật khẩu của bạn</Typography>
+            <Typography color="error">{t('passwordRequire')}</Typography>
           )}
           {errors?.password?.type === "maxLength" && (
-            <Typography color="error">Mật khẩu quá dài!</Typography>
+            <Typography color="error">{t('maxPasswordInvalid')}</Typography>
           )}
           {errors?.password?.type === "minLength" && (
-            <Typography color="error">Mật khẩu quá ngắn!</Typography>
+            <Typography color="error">{t('minPasswordInvalid')}</Typography>
           )}
         </section>
 
         <section>
-          <label>Lưu thông tin đăng nhập</label>
+          <label>{t('rememberMe')}</label>
           <Controller
             name="rememberMe"
             control={control}
@@ -126,7 +129,7 @@ const LoginForm: React.FC = () => {
 
         <section>
           <Button type="submit" variant="contained" color="primary">
-            Đăng nhập
+          {t('login')}
           </Button>
         </section>
       </form>
