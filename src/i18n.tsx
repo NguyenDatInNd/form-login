@@ -5,6 +5,8 @@ import { initReactI18next } from "react-i18next";
 const resources = {
   en: {
     translation: {
+      languge:"Language",
+
       welcome: "Hello!!",
 
       email: "Email Address",
@@ -55,6 +57,8 @@ const resources = {
 
   vi: {
     translation: {
+      languge:"Ngôn ngữ",
+
       welcome: "Xin chào",
 
       email: "Địa chỉ Email",
@@ -69,7 +73,7 @@ const resources = {
 
       region: "Quốc gia",
 
-      state: "Tiểu bang",
+      state: "Thành phố",
 
       rememberMe: "Lưu thông tin đăng nhập",
 
@@ -111,9 +115,9 @@ i18n
   .init({
     resources,
 
-    lng: "en",
+    lng: "vi",
 
-    fallbackLng: "en",
+    fallbackLng: "vi",
 
     interpolation: {
       escapeValue: false, // react already safes from xss

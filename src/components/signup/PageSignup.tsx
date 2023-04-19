@@ -1,7 +1,6 @@
 import FormSignUp from "./FormSignup";
 import logo from "../../logo-420-x-108.png";
 
-
 const PageSignUp = () => {
     return (
         <div  style={{

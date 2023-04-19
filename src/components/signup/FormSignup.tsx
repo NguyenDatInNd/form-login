@@ -4,6 +4,7 @@ import { TextField, Button, Typography, MenuItem } from "@material-ui/core";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useTranslation } from "react-i18next";
 
 type UserSignUpForm = {
@@ -54,52 +55,63 @@ const FormSignUp: React.FC = () => {
   const [countryData, setCountryData] = React.useState<Array<any>>([]);
   const [cityId, setCityId] = React.useState<string>("");
   const [cityData, setCityData] = React.useState<Array<any>>([]);
+  const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-    fetch("http://api.training.div3.pgtest.co/api/v1/location")
-      .then((res) => res.json())
-      .then((data) => {
-        setCountryData(data.data);
-      });
+    async function fetchData() {
+      const res = await fetch("http://api.training.div3.pgtest.co/api/v1/location");
+      const data = await res.json();
+      setCountryData(data.data);
+    }
+    fetchData();
   }, []);
 
   React.useEffect(() => {
-    if (cityId)
-      fetch(`http://api.training.div3.pgtest.co/api/v1/location?pid=${cityId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setCityData(data.data);
-        });
+    async function fetchCityData() {
+      if (cityId) {
+        const res = await fetch(`http://api.training.div3.pgtest.co/api/v1/location?pid=${cityId}`);
+        const data = await res.json();
+        setCityData(data.data);
+      }
+    }
+    fetchCityData();
   }, [cityId]);
 
   const [errorNoti, setErrorNoti] = React.useState(false);
-  const onSubmit = (data: UserSignUpForm) => {
-    fetch("http://api.training.div3.pgtest.co/api/v1/auth/register", {
-      method: "POST",
-      body: JSON.stringify({
-        email: data.email,
-        password: data.password,
-        repeatPassword: data.repeatPassword,
-        name: data.name,
-        gender: data.gender,
-        region: data.region,
-        state: data.state,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.code === 200) {
-          setErrorNoti(false);
-          notifySuccess();
-          setTimeout(() => navigate("/home"), 1000);
-        } else {
-          setErrorNoti(true);
-        }
+  const onSubmit = async (data: UserSignUpForm) => {
+    try {
+      setLoading(true);
+      const response = await fetch("http://api.training.div3.pgtest.co/api/v1/auth/register", {
+        method: "POST",
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          repeatPassword: data.repeatPassword,
+          name: data.name,
+          gender: data.gender,
+          region: data.region,
+          state: data.state,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
+      const responseData = await response.json();
+      if (responseData.code === 200) {
+        setErrorNoti(false);
+        notifySuccess();
+        setTimeout(() => navigate("/home"), 1000);
+      } else {
+        setErrorNoti(true);
+      }
+    } catch (error) {
+      console.error(error);
+      // handle error
+    } finally {
+      setLoading(false);
+    }
   };
+  
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -286,10 +298,17 @@ const FormSignUp: React.FC = () => {
         <section>
           <Button
             style={{ marginTop: "10px" }}
+            disabled={loading}
             type="submit"
             variant="contained"
             color="primary"
           >
+            {loading && (
+              <CircularProgress
+                style={{ position: "relative", right: "7px" }}
+                size="15px"
+              />
+            )}
            {t('register')}
           </Button>
         </section>

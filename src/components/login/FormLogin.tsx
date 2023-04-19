@@ -4,8 +4,8 @@ import { TextField, Checkbox, Button, Typography } from "@material-ui/core";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useTranslation } from "react-i18next";
-
 
 type UserSubmitForm = {
   username: string;
@@ -34,32 +34,46 @@ const LoginForm: React.FC = () => {
   };
 
   const [errorNoti, setErrorNoti] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
 
-  const onSubmit = (data: UserSubmitForm) => {
-    fetch("http://api.training.div3.pgtest.co/api/v1/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email: data.username, password: data.password }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        if (result.code === 200) {
-          setErrorNoti(false);
-          notifySuccess();
-           if (data.rememberMe) {localStorage.setItem("token", result.data.token)};
-          setTimeout(() => navigate("/home"), 1000);
-        } else {
-          setErrorNoti(true);
+  const onSubmit = async (data: UserSubmitForm) => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        "http://api.training.div3.pgtest.co/api/v1/auth/login",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            email: data.username,
+            password: data.password,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-      });
+      );
+      const result = await response.json();
+      if (result.code === 200) {
+        setErrorNoti(false);
+        notifySuccess();
+        if (data.rememberMe) {
+          localStorage.setItem("token", result.data.token);
+        }
+        setTimeout(() => navigate("/home"), 1000);
+      } else {
+        setErrorNoti(true);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <div>
       <form onSubmit={handleSubmit(onSubmit)}>
         {errorNoti && (
-          <Typography color="error">{t('valueInvalid')}</Typography>
+          <Typography color="error">{t("valueInvalid")}</Typography>
         )}
         <section>
           <Controller
@@ -70,7 +84,7 @@ const LoginForm: React.FC = () => {
               <TextField
                 error={!!errors?.username}
                 style={{ height: "55px", width: "300px" }}
-                label={t('email')}
+                label={t("email")}
                 size="medium"
                 {...field}
                 {...register("username")}
@@ -78,10 +92,10 @@ const LoginForm: React.FC = () => {
             )}
           />
           {errors?.username?.type === "required" && (
-            <Typography color="error">{t('emailRequire')}</Typography>
+            <Typography color="error">{t("emailRequire")}</Typography>
           )}
           {errors?.username?.type === "pattern" && (
-            <Typography color="error">{t('emailInvalid')}</Typography>
+            <Typography color="error">{t("emailInvalid")}</Typography>
           )}
         </section>
         <section>
@@ -94,7 +108,7 @@ const LoginForm: React.FC = () => {
                 error={!!errors?.password}
                 style={{ height: "55px", width: "300px" }}
                 size="medium"
-                label={t('password')}
+                label={t("password")}
                 type="password"
                 {...field}
                 {...register("password")}
@@ -102,18 +116,18 @@ const LoginForm: React.FC = () => {
             )}
           />
           {errors?.password?.type === "required" && (
-            <Typography color="error">{t('passwordRequire')}</Typography>
+            <Typography color="error">{t("passwordRequire")}</Typography>
           )}
           {errors?.password?.type === "maxLength" && (
-            <Typography color="error">{t('maxPasswordInvalid')}</Typography>
+            <Typography color="error">{t("maxPasswordInvalid")}</Typography>
           )}
           {errors?.password?.type === "minLength" && (
-            <Typography color="error">{t('minPasswordInvalid')}</Typography>
+            <Typography color="error">{t("minPasswordInvalid")}</Typography>
           )}
         </section>
 
         <section>
-          <label>{t('rememberMe')}</label>
+          <label>{t("rememberMe")}</label>
           <Controller
             name="rememberMe"
             control={control}
@@ -128,8 +142,19 @@ const LoginForm: React.FC = () => {
         </section>
 
         <section>
-          <Button type="submit" variant="contained" color="primary">
-          {t('login')}
+          <Button
+            disabled={loading}
+            type="submit"
+            variant="contained"
+            color="primary"
+          >
+            {loading && (
+              <CircularProgress
+                style={{ position: "relative", right: "7px" }}
+                size="15px"
+              />
+            )}
+            {t("login")}
           </Button>
         </section>
       </form>
