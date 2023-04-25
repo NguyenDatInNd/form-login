@@ -5,13 +5,13 @@ import { useTranslation } from "react-i18next";
 
 const LoginPage = () => {
   const { t } = useTranslation();
+
   return (
     <div
-      className="container"
       style={{
-        // background:"rgb(66,66,66",
         height: "100vh",
         display: "flex",
+        // background:"black",
         alignItems: "center",
         justifyContent: "center",
         flexDirection: "column",

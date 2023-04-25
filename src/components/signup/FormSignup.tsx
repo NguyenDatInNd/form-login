@@ -100,7 +100,7 @@ const FormSignUp: React.FC = () => {
       if (responseData.code === 200) {
         setErrorNoti(false);
         notifySuccess();
-        setTimeout(() => navigate("/home"), 1000);
+        setTimeout(() => navigate("/login"), 1000);
       } else {
         setErrorNoti(true);
       }
