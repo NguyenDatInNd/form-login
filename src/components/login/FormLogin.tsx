@@ -6,8 +6,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useTranslation } from "react-i18next";
-import { useAppDispatch } from "../../redux/store";
-import { fetchDataAllProduct } from "../../redux/reducer";
 
 type UserSubmitForm = {
   username: string;
@@ -58,15 +56,13 @@ const LoginForm: React.FC = () => {
       if (result.code === 200) {
         setErrorNoti(false);
         notifySuccess();
-        if (data.rememberMe) {
-          document.cookie =
-            "token=" +
-            result.data.token +
-            "; expires=" +
-            new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString() +
-            "; path=/";
-        }
-        setTimeout(() => navigate("/home"), 1000);
+        document.cookie =
+          "token=" +
+          result.data.token +
+          "; expires=" +
+          new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toUTCString() +
+          "; path=/";
+        setTimeout(() => navigate("/"), 1000);
       } else {
         setErrorNoti(true);
       }
@@ -76,8 +72,6 @@ const LoginForm: React.FC = () => {
       setLoading(false);
     }
   };
-
-
 
   return (
     <div>

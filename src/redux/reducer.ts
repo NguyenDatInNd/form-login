@@ -8,6 +8,7 @@ export interface IData {
   currency: string;
   total: number;
   invoice: string;
+  createdAt: string
 }
 
 interface IDatas {
@@ -103,18 +104,19 @@ export const fetchDeleteProduct = createAsyncThunk(
     const response = await fetch(
       `http://api.training.div3.pgtest.co/api/v1/product/${data.id}`,
       {
+        method:"DELETE",
         headers: { Authorization: data.token },
       }
     );
-    const result = await response.json();
-    return result;
+    return data.id;
   }
 );
 
 const dataSlice = createSlice({
   name: "data",
   initialState,
-  reducers: {},
+  reducers: {
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchDataAllProduct.fulfilled, (state, action) => {
@@ -125,6 +127,13 @@ const dataSlice = createSlice({
       })
       .addCase(fetchInforUser.fulfilled, (state, action) => {
         state.InforUser = action.payload.data;
+      })
+      .addCase(fetchDeleteProduct.fulfilled, (state, action) => {
+        const idToDelete = action.payload;
+        const datas = JSON.parse(JSON.stringify(state.Products))
+        state.Products = datas.filter((data:any) => data.id !== idToDelete);
+        console.log(state.Products)
+        console.log(idToDelete)
       });
   },
 });
