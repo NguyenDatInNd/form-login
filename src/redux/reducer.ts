@@ -8,28 +8,23 @@ export interface IData {
   currency: string;
   total: number;
   invoice: string;
-  createdAt: string
+  updatedAt: string;
 }
 
 interface IDatas {
   Products: IData[];
   ProductByID: any;
   InforUser: any;
-}
-
-interface IInforUser {
-  name: string,
-  email: string,
-  avatar: string,
-  description: string,
-  state: number,
-  region:number,
+  FilterStatus: string;
+  FilterClient: string;
 }
 
 const initialState: IDatas = {
   Products: [],
   ProductByID: {},
   InforUser: {},
+  FilterStatus: "",
+  FilterClient: "",
 };
 
 export const fetchInforUser = createAsyncThunk(
@@ -62,25 +57,27 @@ export const fetchDataAllProduct = createAsyncThunk(
 
 export const fetchUpdateProduct = createAsyncThunk(
   "data/fetchUpdateProduct",
-  async (data: any) => {
-    const response = await fetch(
+  async (data: any, { dispatch }) => {
+    await fetch(
       "http://api.training.div3.pgtest.co/api/v1/product",
       {
-        method: "POST",
+        method: "PUT",
         body: JSON.stringify({
           id: data.id,
+          order: data.order,
           status: data.status,
-          date: data.date,
-          client: data.client,
           currency: data.currency,
           total: data.total,
-          invoice: data.invoice,
+          fundingMethod: data.fundingMethod,
         }),
-        headers: { Authorization: data.token },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: data.token,
+        },
       }
     );
-    const result = await response.json();
-    return result;
+    dispatch(fetchDataAllProduct(document.cookie.split("=")[1]));
+    return data.id;
   }
 );
 
@@ -100,14 +97,15 @@ export const fetchDataProductById = createAsyncThunk(
 
 export const fetchDeleteProduct = createAsyncThunk(
   "data/fetchDeleteProduct",
-  async (data: any) => {
-    const response = await fetch(
+  async (data: any, { dispatch }) => {
+    await fetch(
       `http://api.training.div3.pgtest.co/api/v1/product/${data.id}`,
       {
-        method:"DELETE",
+        method: "DELETE",
         headers: { Authorization: data.token },
       }
     );
+    dispatch(fetchDataAllProduct(document.cookie.split("=")[1]));
     return data.id;
   }
 );
@@ -116,11 +114,23 @@ const dataSlice = createSlice({
   name: "data",
   initialState,
   reducers: {
+    filterStatus: (state, action: PayloadAction<string>) => {
+      state.FilterStatus = action.payload;
+    },
+    filterClient: (state, action: PayloadAction<string>) => {
+      state.FilterClient = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchDataAllProduct.fulfilled, (state, action) => {
-        state.Products = action.payload.data;
+        state.Products = action.payload.data.filter((value: any) => {
+          return (
+            // value.client.includes(state.FilterClient)
+            //  &&
+            value.status.includes(state.FilterStatus)
+          );
+        });
       })
       .addCase(fetchDataProductById.fulfilled, (state, action) => {
         state.ProductByID = action.payload.data;
@@ -129,16 +139,12 @@ const dataSlice = createSlice({
         state.InforUser = action.payload.data;
       })
       .addCase(fetchDeleteProduct.fulfilled, (state, action) => {
-        const idToDelete = action.payload;
-        const datas = JSON.parse(JSON.stringify(state.Products))
-        state.Products = datas.filter((data:any) => data.id !== idToDelete);
-        console.log(state.Products)
-        console.log(idToDelete)
+        state.Products.splice(action.payload, 1);
       });
   },
 });
 
-export const {} = dataSlice.actions;
+export const { filterStatus, filterClient } = dataSlice.actions;
 
 const { reducer } = dataSlice;
 

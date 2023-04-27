@@ -1,9 +1,10 @@
 import React from "react";
-import { fetchDataAllProduct } from "../redux/reducer";
+import { fetchDataAllProduct, filterClient, filterStatus } from "../redux/reducer";
 import { RootState, useAppDispatch } from "../redux/store";
 import { useSelector } from "react-redux";
 import {
   Button,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -11,6 +12,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TextField,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -40,19 +42,40 @@ const StyledFlex = styled.div`
   margin: 15px 30px;
   button {
     margin: 0 8px;
+    height:56px
   }
 `;
 
 function HomePage() {
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [page, setPage] = React.useState(0);
+  const [status, setStatus] = React.useState("");
+  const [client, setClient] = React.useState("");
+  
+  const options = [
+    { value: "RECEIVED" },
+    { value: "PENDING" },
+    { value: "FULFILLED" },
+    { value: "PROCESSING" },
+    { value: "" },
+  ];
+
+  const handleChangeClient = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setClient(event.target.value);
+    dispatch(filterClient(event.target.value))
+  };
+
+  const handleChangeStatus = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setStatus(event.target.value);
+    dispatch(filterStatus(event.target.value))
+  };
+
   const dispatch = useAppDispatch();
   React.useEffect(() => {
     dispatch(fetchDataAllProduct(document.cookie.split("=")[1]));
-  }, [dispatch]);
+  }, [dispatch, status , client]);
 
   const value = useSelector((state: RootState) => state.Products);
-  console.log(value)
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -64,9 +87,6 @@ function HomePage() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, value.length - page * rowsPerPage);
 
   return (
     <div style={{}}>
@@ -80,14 +100,29 @@ function HomePage() {
       </StyledFlex>
       <StyledFlex>
         <div>
-          <Button variant="outlined">
-            Status
-            <ExpandMoreIcon />
-          </Button>
-          <Button variant="outlined">
-            Client
-            <ExpandMoreIcon />
-          </Button>
+          <TextField
+            style={{width:"150px"}}
+            variant="filled"
+            size="medium"
+            select
+            label="Select"
+            value={status}
+            onChange={handleChangeStatus}
+          >
+            {options.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.value === "" ? "-" : option.value}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            style={{width:"150px", marginLeft:"10px", marginRight:"5px"}}
+            variant="filled"
+            size="medium"
+            label="Client"
+            value={client}
+            onChange={handleChangeClient}
+          />
           <Button variant="outlined">
             Form
             <EventNoteIcon />
@@ -130,7 +165,7 @@ function HomePage() {
                     {row.status}
                   </TableCell>
                   <TableCell align="center">
-                    {moment(`${row.createdAt}`).format("DD MMM YYYY")}
+                    {moment(`${row.updatedAt}`).format("DD MMM YYYY")}
                   </TableCell>
                   <TableCell align="center">{row.client}</TableCell>
                   <TableCell align="center">{row.currency}</TableCell>

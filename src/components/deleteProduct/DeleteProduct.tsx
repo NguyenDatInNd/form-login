@@ -8,7 +8,6 @@ import {
   Divider,
 } from "@mui/material";
 import DeleteOutlineIcon from "@material-ui/icons/DeleteOutline";
-import React from "react";
 import { useAppDispatch } from "../../redux/store";
 import { fetchDeleteProduct } from "../../redux/reducer";
 
